@@ -2,7 +2,7 @@ import telebot
 import time
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-token = "2062019393:AAG2NAfRiNB_Hinwc4zEI77cRNEdfWi1LLs"
+token = "<API KEY>"
 
 bot = telebot.TeleBot(token=token)
 
