@@ -72,7 +72,7 @@ def get_weather(WEATHER_API_KEY, latitude, longitude):
     humidity = result['main']['humidity']
     windspeed = result['wind']['speed']
     wind_degree = result['wind']['deg']
-    city = result['Agartala']
+    city = result['name']
     final = {
         "main": main,
         "description": description,
@@ -117,6 +117,9 @@ def degrees_to_direction(deg):
     """
     Function to convert degrees to direction.
     """
+    
+    if deg == 0:
+        return ""
 
     dir_arr = [
             "North","North-North East",
@@ -130,7 +133,8 @@ def degrees_to_direction(deg):
             "North"
             ]
 
-    return dir_arr[int(((deg%360)//22.5))]
+    result = dir_arr[int(((deg%360)//22.5))]
+    return f"due *{result}*"
 
 
 # Weather and memes query handler
@@ -145,7 +149,8 @@ def callback_query(call):
             longitude = message.location.longitude
 
             weather_result=get_weather(WEATHER_API_KEY, latitude, longitude)
-            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} on {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* due *{degrees_to_direction(weather_result['wind_degree'])}*\n\n")
+
+            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\n\n")
 
 
     elif call.data == "memes":
