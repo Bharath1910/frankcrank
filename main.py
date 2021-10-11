@@ -25,7 +25,7 @@ def gen_markup():
 
 @bot.message_handler(commands=['start'])
 def message_handler(message):
-    bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;)", reply_markup=gen_markup())
+    bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;) \n\n🎲 Maybe throw a dice? - /roll", reply_markup=gen_markup())
 
 # Sends a dice
 @bot.message_handler(commands=['roll'])
