@@ -1,39 +1,29 @@
+# dependencies
 import telebot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 from dotenv import load_dotenv
-
-
+import requests
 import math
 import os
-import requests
+
 
 load_dotenv()
 
-
+# secrets
 TOKEN = os.getenv('TOKEN')
 WEATHER_API_KEY=os.getenv('WEATHER_API_KEY')
 
+
 bot = telebot.TeleBot(token=TOKEN, parse_mode="markdown")
 
+ 
 
-@bot.message_handler(commands=['roll'])
-def send(msg):
-    bot.send_dice(chat_id=msg.chat.id)   
-
-
-def gen_markup():
-    markup = InlineKeyboardMarkup()
-    markup.row_width = 2
-
-    markup.add(
-        InlineKeyboardButton("Weather", callback_data="weather"),
-        InlineKeyboardButton("Memes", callback_data="memes"),
-        InlineKeyboardButton("Check out my source code", url="https://github.com/bharath1910/frankcrank" )
-        )
-
-    return markup
 
 def help_markup():
+    """
+    Inline keyboard button layout, for /help
+    """
+
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
 
@@ -45,8 +35,27 @@ def help_markup():
 
     return markup
 
+def gen_markup():
+    """
+    Inline keyboard button layout, for /start
+    """
+
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+
+    markup.add(
+        InlineKeyboardButton("Weather", callback_data="weather"),
+        InlineKeyboardButton("Memes", callback_data="memes"),
+        InlineKeyboardButton("Check out my source code", url="https://github.com/bharath1910/frankcrank" )
+        )
+
+    return markup
 
 def get_weather(WEATHER_API_KEY, latitude, longitude):
+    """
+    Function to get weather data.
+    """
+
     url = f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={WEATHER_API_KEY}'
     result = requests.get(url).json()
 
@@ -63,6 +72,7 @@ def get_weather(WEATHER_API_KEY, latitude, longitude):
     humidity = result['main']['humidity']
     windspeed = result['wind']['speed']
     wind_degree = result['wind']['deg']
+    city = result['name']
     final = {
         "main": main,
         "description": description,
@@ -72,26 +82,45 @@ def get_weather(WEATHER_API_KEY, latitude, longitude):
         "pressure": pressure,
         "humidity": humidity,
         "windspeed": windspeed,
-        "wind_degree": wind_degree
+        "wind_degree": wind_degree,
+        "city": city
     }
     return final
 
 
-
+# /start
 @bot.message_handler(commands=['start'])
 def message_handler(message):
     bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;) \n\n🎲 Maybe throw a dice? - /roll \n\n*Developers*\n@PythonNotFound\n@shaunc276", reply_markup=gen_markup())
 
+# /help, sends help text
 @bot.message_handler(commands=['help'])
 def msg_handler(msg):
     bot.send_message(msg.chat.id,"👋 *Hi, I have 3 main functions.*\n\n *1. ⛅️ Get local weather*\n    - Send /start to me and click the weather button.\n    - Click the 📎 and send the location to get the weather data.\n    - *Note:* This will only works on Mobile.\n\n*2.🐸 Get desired memes!*\n    - This feature is not yet implemented\n\n*3.🎲 Roll em!*\n    - Send /roll to me and I will roll a dice for ya\n\nIf you happened to find any bugs, feel free to message *PythonNotFound* or *Shaun*, or open a new issue on the bot's GitHub Page.\n\n*Made with ❤️ using Python.*", reply_markup=help_markup())
 
 
+# /roll, sends a dice
+@bot.message_handler(commands=['roll'])
+def send(msg):
+    bot.send_dice(chat_id=msg.chat.id)  
+
+
 
 def ms_km(num):
+    """
+    Function to convert m/s to km/h
+    """
+
     return (math.floor(3.6 * num))
 
 def degrees_to_direction(deg):
+    """
+    Function to convert degrees to direction.
+    """
+    
+    if deg == 0:
+        return ""
+
     dir_arr = [
             "North","North-North East",
             "North East","East-North East",
@@ -104,9 +133,11 @@ def degrees_to_direction(deg):
             "North"
             ]
 
-    return dir_arr[int(((deg%360)//22.5))]
+    result = dir_arr[int(((deg%360)//22.5))]
+    return f"due *{result}*"
 
 
+# Weather and memes query handler
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == "weather":
@@ -118,12 +149,13 @@ def callback_query(call):
             longitude = message.location.longitude
 
             weather_result=get_weather(WEATHER_API_KEY, latitude, longitude)
-            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} on Mountain View.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* due *{degrees_to_direction(weather_result['wind_degree'])}*\n\n")
+
+            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\n\n")
 
 
     elif call.data == "memes":
         bot.send_message(call.message.chat.id, "Memes not added yet :P")
         
 
-
+# polling section
 bot.infinity_polling()
