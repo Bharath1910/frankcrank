@@ -1,8 +1,11 @@
-import telebot
-import time
+# dependencies
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+from dotenv import load_dotenv
+import telebot, time, os
 
-token = 
+#Tokens
+token = os.getenv("TOKEN")
+
 
 bot = telebot.TeleBot(token=token)
 
