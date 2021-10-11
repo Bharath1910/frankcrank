@@ -7,10 +7,11 @@ import telebot, time, os
 load_dotenv()
 
 #Tokens
-token = os.getenv('TOKEN')
+WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+TOKEN = os.getenv('TOKEN')
 
 
-bot = telebot.TeleBot(token=token, parse_mode="markdown")
+bot = telebot.TeleBot(token=TOKEN, parse_mode="markdown")
 
 def gen_markup():
     markup = InlineKeyboardMarkup()
@@ -18,14 +19,31 @@ def gen_markup():
 
     markup.add(
         InlineKeyboardButton("Weather", callback_data="weather"),
-        InlineKeyboardButton("Memes", callback_data="memes")
+        InlineKeyboardButton("Memes", callback_data="memes"),
+        InlineKeyboardButton("Check out my source code", url="https://github.com/bharath1910/frankcrank" )
         )
 
     return markup
 
+def help_markup():
+    markup1 = InlineKeyboardMarkup()
+    markup1.row_width(2)
+
+    markup1.add(
+        InlineKeyboardButton("Contact", url="https://t.me/PythonNotFound"),
+        InlineKeyboardButton("Contact",url="https://t.me/shaunc276" ),
+        InlineKeyboardButton("Submit New Issue on GitHub", url="https://github.com/Bharath1910/frankcrank/issues")
+    )
+    
+    return markup1
+
 @bot.message_handler(commands=['start'])
 def message_handler(message):
-    bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;) \n\n🎲 Maybe throw a dice? - /roll", reply_markup=gen_markup())
+    bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;) \n\n🎲 Maybe throw a dice? - /roll \n\n*Developers*\n@PythonNotFound\n@shaunc276", reply_markup=gen_markup())
+
+@bot.message_handler(commands=['help'])
+def message_handler(msg):
+    bot.send_message(msg.chat.id, "Help", reply_markup=help_markup())
 
 # Sends a dice
 @bot.message_handler(commands=['roll'])
