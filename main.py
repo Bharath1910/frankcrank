@@ -3,11 +3,14 @@ from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 from dotenv import load_dotenv
 import telebot, time, os
 
+# dotenv
+load_dotenv()
+
 #Tokens
-token = os.getenv("TOKEN")
+token = os.getenv('TOKEN')
 
 
-bot = telebot.TeleBot(token=token)
+bot = telebot.TeleBot(token=token, parse_mode="markdown")
 
 def gen_markup():
     markup = InlineKeyboardMarkup()
@@ -22,7 +25,7 @@ def gen_markup():
 
 @bot.message_handler(commands=['start'])
 def message_handler(message):
-    bot.send_message(message.chat.id, "Welcome!", reply_markup=gen_markup())
+    bot.send_message(message.chat.id, "👋 *Hi, I am Frank.* \n \n🌤 I can send the current weather in your locality. \n🐸 I can send memes ;)", reply_markup=gen_markup())
 
 # Sends a dice
 @bot.message_handler(commands=['roll'])
@@ -50,6 +53,7 @@ while True:
         bot.polling()
     
     except Exception:
+        print("Failed, Retrying in 15 seconds")
         time.sleep(15)
 
     
