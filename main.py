@@ -21,14 +21,12 @@ def gen_markup():
 def message_handler(message):
     bot.send_message(message.chat.id, "Welcome!", reply_markup=gen_markup())
 
+# Sends a dice
 @bot.message_handler(commands=['roll'])
 def send(msg):
     bot.send_dice(chat_id=msg.chat.id)
 
-@bot.message_handler(content_types=['location'])
-def handle_location(message):
-    print("{0}, {1}".format(message.location.latitude, message.location.longitude))
-
+# Weather and memes query handler
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == "weather":
@@ -36,12 +34,14 @@ def callback_query(call):
 
         @bot.message_handler(content_types=['location'])
         def handle_location(message):
+            # use the openweatherapi here
             print("{0}, {1}".format(message.location.latitude, message.location.longitude))
 
     elif call.data == "memes":
         bot.send_message(call.message.chat.id, "Memes not added yet :P")
 
 
+# Polling section
 while True:
     try:
         bot.polling()
