@@ -1,5 +1,4 @@
 # dependencies
-from re import sub
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 import telebot, requests, math, os, time, praw, random
 from dotenv import load_dotenv
@@ -257,13 +256,17 @@ def callback_query(call):
         bot.send_message(call.message.chat.id, st_reddit().title)
     
     elif call.data == "memes":
-        bot.send_photo(call.message.chat.id,memes_reddit().url,memes_reddit().title)
+        meme = memes_reddit()
+        bot.send_photo(call.message.chat.id,meme.url,meme.title)
     
     elif call.data == "aww":
-        bot.send_photo(call.message.chat.id, aww_reddit().url)
+        a = aww_reddit()
+        bot.send_photo(call.message.chat.id, a.url,a.title)
     
     elif call.data == "joke":
-        pass
+        jokes = jokes_reddit()
+        bot.send_message(call.message.chat.id,f"*{jokes.title}*\n\n{jokes.selftext}")
+        
 
 
         
