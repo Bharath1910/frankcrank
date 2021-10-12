@@ -1,19 +1,28 @@
 # dependencies
+from re import sub
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
-import telebot, requests, math, os, time
+import telebot, requests, math, os, time, praw, random
 from dotenv import load_dotenv
-
-
 load_dotenv()
 
 # secrets
 TOKEN = os.getenv('TOKEN')
 WEATHER_API_KEY=os.getenv('WEATHER_API_KEY')
 
+# PRAW setup
+reddit = praw.Reddit(
+    client_id=os.getenv('REDDIT_CLIENT'),
+    client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
+    username=os.getenv('REDDIT_USERNAME'),
+    password=os.getenv('REDDIT_PASSWORD'),
+    user_agent="Frank"
+)
 
-bot = telebot.TeleBot(token=TOKEN, parse_mode="markdown")
-
- 
+# Telebot setup
+bot = telebot.TeleBot(
+    token=TOKEN, 
+    parse_mode="markdown"
+    )
 
 
 def help_markup():
@@ -42,9 +51,22 @@ def gen_markup():
 
     markup.add(
         InlineKeyboardButton("Weather", callback_data="weather"),
-        InlineKeyboardButton("Memes", callback_data="memes"),
+        InlineKeyboardButton("Fun", callback_data="fun"),
         InlineKeyboardButton("Check out my source code", url="https://github.com/bharath1910/frankcrank" )
         )
+
+    return markup
+
+def fun_markup():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 3
+
+    markup.add(
+        InlineKeyboardButton("Memes", callback_data="memes"),
+        InlineKeyboardButton("Aww", callback_data="aww"),
+        InlineKeyboardButton("Joke", callback_data="joke"),
+        InlineKeyboardButton("Shower Thoughts", callback_data="st")
+    )
 
     return markup
 
@@ -84,6 +106,56 @@ def get_weather(WEATHER_API_KEY, latitude, longitude):
     }
     return final
 
+def st_reddit():
+    st = reddit.subreddit("Showerthoughts")
+    top = st.top(limit = 50)
+
+    submission = []
+
+    for i in top:
+        submission.append(i)
+    
+    return random.choice(submission)
+
+def memes_reddit():
+    memes = reddit.subreddit("memes")
+    top = memes.top(limit=50)
+
+    submission = []
+
+    for i in top:
+        submission.append(i)
+    
+    return random.choice(submission)
+
+def aww_reddit():
+    memes = reddit.subreddit("aww")
+    top = memes.top("week",limit=50)
+
+    submission = []
+
+    for i in top:
+        if "jpg" in i.url[len(i.url) - 3:] or "png" in i.url[len(i.url)-3]:
+            submission.append(i)
+    
+        else:
+            pass
+    
+    return random.choice(submission)
+    
+def jokes_reddit():
+    jokes = reddit.subreddit("Jokes")
+    top = jokes.top("week",limit=50)
+
+    submission = [] 
+    for i in top:
+        if i.over_18:
+            pass
+        
+        else:
+            submission.append(i)
+
+    return random.choice(submission)
 
 # /start
 @bot.message_handler(commands=['start'])
@@ -103,7 +175,28 @@ def msg_handler(msg):
 # /roll, sends a dice
 @bot.message_handler(commands=['roll'])
 def send(msg):
-    bot.send_dice(chat_id=msg.chat.id)  
+    bot.send_dice(chat_id=msg.chat.id)
+
+# /st, sends a shower thought
+@bot.message_handler(commands=['st'])
+def send(msg):
+    bot.send_message(msg.chat.id,st_reddit().title)
+
+@bot.message_handler(commands=['meme'])
+def send(msg):
+    memes = memes_reddit()
+    bot.send_photo(msg.chat.id, memes.url, memes.title)
+
+@bot.message_handler(commands=['aww'])
+def send(msg):
+    a = aww_reddit()
+    bot.send_photo(msg.chat.id, a.url, a.title)
+
+@bot.message_handler(commands=['joke'])
+def send(msg):
+    jokes = jokes_reddit()
+    bot.send_message(msg.chat.id,f"*{jokes.title}*\n\n{jokes.selftext}")
+    
 
 
 
@@ -157,8 +250,22 @@ def callback_query(call):
             bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\nAPI Responce time : *{round(end-x,2)}s*")
 
 
+    elif call.data == "fun":
+        bot.send_message(call.message.chat.id, "Hey!, So you finally decided to have some fun.\n\n*- Memes:* Sends top memes of the day [/meme]!\n*- Aww:* Get a cute and cuddly picture! [/aww]\n*- Jokes:* Sends tops jokes [/jokes]\n*- Shower Thoughts:* Get a shower thought [/st]\n\nNew features coming soon, stay in touch :D", reply_markup=fun_markup())
+
+    elif call.data == "st":
+        bot.send_message(call.message.chat.id, st_reddit().title)
+    
     elif call.data == "memes":
-        bot.send_message(call.message.chat.id, "Memes not added yet :P")
+        bot.send_photo(call.message.chat.id,memes_reddit().url,memes_reddit().title)
+    
+    elif call.data == "aww":
+        bot.send_photo(call.message.chat.id, aww_reddit().url)
+    
+    elif call.data == "joke":
+        pass
+
+
         
 
 # polling section
