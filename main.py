@@ -1,10 +1,7 @@
 # dependencies
-import telebot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+import telebot, requests, math, os, time
 from dotenv import load_dotenv
-import requests
-import math
-import os
 
 
 load_dotenv()
@@ -152,9 +149,12 @@ def callback_query(call):
             latitude = message.location.latitude
             longitude = message.location.longitude
 
+            x = time.time()
             weather_result=get_weather(WEATHER_API_KEY, latitude, longitude)
+            end = time.time()
+            
 
-            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\n\n")
+            bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\nAPI Responce time : *{round(end-x,2)}s*")
 
 
     elif call.data == "memes":
