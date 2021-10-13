@@ -21,7 +21,7 @@ CLIENT_ID=os.getenv('CLIENT_ID')
 CLIENT_SECRET=os.getenv('CLIENT_SECRET')
 PASSWORD=os.getenv('PASSWORD')
 USER_AGENT=os.getenv('USER_AGENT')
-USERNAME=os.getenv('USERNAME')
+USER_NAME=os.getenv('USER_NAME')
 
 # telebot setup
 bot = telebot.TeleBot(
@@ -36,7 +36,7 @@ reddit = praw.Reddit(
     client_secret=CLIENT_SECRET,
     password=PASSWORD,
     user_agent=USER_AGENT,
-    username=USERNAME
+    username=USER_NAME
 )
 
 
