@@ -6,3 +6,4 @@ Message him at [@frankcrank_bot](https://t.me/frankcrank_bot)
 ## Thanks to
  - [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI) 
  - [python-dotenv](https://github.com/theskumar/python-dotenv)
+ - [PRAW](https://github.com/praw-dev/praw)
