@@ -133,7 +133,7 @@ def get_weather(WEATHER_API_KEY, latitude, longitude):
 
 def st_reddit():
     st = reddit.subreddit("Showerthoughts")
-    top = st.top("month", limit = 50)
+    top = st.top("month", limit = 20)
 
     submission = []
 
@@ -145,7 +145,7 @@ def st_reddit():
 
 def memes_reddit():
     memes = reddit.subreddit("memes")
-    top = memes.top("month", limit=50)
+    top = memes.top("month", limit=20)
 
     submission = []
 
@@ -157,7 +157,7 @@ def memes_reddit():
 
 def aww_reddit():
     memes = reddit.subreddit("aww")
-    top = memes.top("month",limit=50)
+    top = memes.top("month",limit=20)
 
     submission = []
 
@@ -171,7 +171,7 @@ def aww_reddit():
     
 def jokes_reddit():
     jokes = reddit.subreddit("Jokes")
-    top = jokes.top("month",limit=50)
+    top = jokes.top("month",limit=20)
 
     submission = [] 
     for i in top:
@@ -189,7 +189,7 @@ def message_handler(message):
 # /help, sends help text
 @bot.message_handler(commands=['help'])
 def msg_handler(msg):
-    bot.send_message(msg.chat.id,"👋 *Hi*\n\n *1. ⛅️ Get local weather*\n    - Send /start and click the eather button.\n    - Click the 📎 and send the location to get the weather data.\n    - *Note:* This will only work on Mobile.\n\n*2. 🍅 Pomodoro Timer*\n    - Send /start and click pomodoro timer button.\n\n*3. 😃 Fun commands*\n    - Send /start and click the fun button.\n\n*4.🎲 Roll em!*\n    - Send /roll to me and I will roll a dice for you.\n\nIf you find any bugs, feel free to message *PythonNotFound* or *Shaun*, or open a new issue on the bot's GitHub Page.\n\n*Made with ❤️ using Python.*", reply_markup=help_markup())
+    bot.send_message(msg.chat.id,"👋 *Hi*\n\n *1. ⛅️ Get local weather*\n    - Send /start and click the weather button.\n    - Click the 📎 and send the location to get the weather data.\n    - *Note:* This will only work on Mobile.\n\n*2. 🍅 Pomodoro Timer*\n    - Send /start and click pomodoro timer button.\n\n*3. 😃 Fun commands*\n    - Send /start and click the fun button.\n\n*4.🎲 Roll em!*\n    - Send /roll to me and I will roll a dice for you.\n\nIf you find any bugs, feel free to message *PythonNotFound* or *Shaun*, or open a new issue on the bot's GitHub Page.\n\n*Made with ❤️ using Python.*", reply_markup=help_markup())
 
 
 # /roll, sends a dice
@@ -268,7 +268,7 @@ def callback_query(call):
             bot.send_message(message.chat.id,f"{weather_result['main']}, Expected {weather_result['description']} in {weather_result['city']}.\n\n*More Information:*\n    *-  Average Temperature* : {weather_result['temp']}C\n    *-  Minimum Temperature* : {weather_result['temp_min']}C\n    *-  Maximum Temperature* : {weather_result['temp_max']}C\n    *-  Atmospheric Pressure* : {weather_result['pressure']}hpa\n    *-  Humidity* : {weather_result['humidity']}%\n\nWind speed *{ms_km(weather_result['windspeed'])}km/h* {degrees_to_direction(weather_result['wind_degree'])}\n\n")
 
     elif call.data == "pomodoro":
-        bot.send_message(call.message.chat.id, "start to start a timer, stop to cancel the timer")
+        bot.send_message(call.message.chat.id, "Send 'start' to start a timer or 'stop' to cancel the timer.")
 
         @bot.message_handler(content_types=['text'])
         def handle_pomodoro(message):
@@ -338,7 +338,7 @@ def callback_query(call):
 
         
     elif call.data == "fun":
-        bot.send_message(call.message.chat.id, "Hey! So you finally decided to have some fun.\n\n*- Memes:* Sends a top meme [/meme]\n*- Aww:* Get a cute picture! [/aww]\n*- Jokes:* Sends a joke [/jokes]\n*- Shower Thoughts:* Get a shower thought [/st]\n\nNew features coming soon :D", reply_markup=fun_markup())
+        bot.send_message(call.message.chat.id, "So you finally decided to have some fun\n\n*- Memes:* Sends a top meme [/meme]\n*- Aww:* Get a cute picture! [/aww]\n*- Jokes:* Sends a joke [/jokes]\n*- Shower Thoughts:* Get a shower thought [/st]\n\nNew features coming soon :D", reply_markup=fun_markup())
 
     elif call.data == "st":
         bot.send_message(call.message.chat.id, st_reddit().title)
